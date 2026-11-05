@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trabajo de Aplicación II Corte - Unidad Aritmético-Lógica (ALU)</title>
+  <style>
+    :root {
+      --bg: #0f1416;
+      --card-bg: #182026;
+      --accent: #10b981;
+      --accent-secondary: #34d399;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #263238;
+      --highlight: #34d399;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.88) 0%, rgba(6, 78, 59, 0.90) 100%), 
+                  url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+      padding: 3.5rem 1.5rem;
+      text-align: center;
+      border-bottom: 2px solid var(--accent);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    header h1 { font-size: 2.5rem; color: var(--accent-secondary); margin-bottom: 0.5rem; }
+    header p { color: var(--text-muted); font-size: 1.15rem; }
+
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(24, 32, 38, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      padding: 0.8rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    nav a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.3s; }
+    nav a:hover { color: var(--accent); }
+
+    .container { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+
+    .hero-carousel {
+      background: #111827;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      min-height: 180px;
+    }
+
+    .hero-slide { display: none; }
+    .hero-slide.active { display: block; }
+    .hero-slide h3 { color: var(--accent-secondary); font-size: 1.4rem; margin-bottom: 0.5rem; }
+    .hero-slide p { color: var(--text); font-size: 1.05rem; }
+
+    .hero-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+    .hero-btn { background: var(--accent); color: #042f2e; border: none; padding: 0.4rem 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; }
+    .hero-dots { display: flex; gap: 0.6rem; }
+    .h-dot { height: 12px; width: 12px; background-color: var(--border); border-radius: 50%; cursor: pointer; }
+    .h-dot.active-h-dot { background-color: var(--accent); }
+
+    section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      scroll-margin-top: 70px;
+    }
+
+    h2 { color: var(--accent); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1.2rem; font-size: 1.6rem; }
+    h3 { color: var(--accent-secondary); margin: 1.2rem 0 0.5rem 0; font-size: 1.2rem; }
+    p, ul, ol { color: #d1d5db; margin-bottom: 1rem; }
+    ul, ol { padding-left: 1.5rem; }
+    li { margin-bottom: 0.4rem; }
+
+    .simulator {
+      background: #0b0f12;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin: 1.5rem 0;
+    }
+
+    .sim-controls { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    input, select { background: #212d35; color: #fff; border: 1px solid #374151; padding: 0.6rem 1rem; border-radius: 6px; }
+    button { background: var(--accent); color: #042f2e; font-weight: bold; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }
+    .result-box { font-family: monospace; font-size: 1.1rem; background: #111827; padding: 0.8rem 1rem; border-radius: 6px; color: var(--highlight); }
+
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-top: 1rem; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem; }
+    code { background: #212d35; color: #f43f5e; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Unidad Aritmético-Lógica (ALU)</h1>
+    <p>Trabajo de Aplicación II Corte - Arquitectura de Computadores</p>
+  </header>
+
+  <nav>
+    <a href="#intro">1. Introducción</a>
+    <a href="#aritmetica">2. U. Aritmética</a>
+    <a href="#logica">3. U. Lógica</a>
+    <a href="#desplazamiento">4. U. Desplazamiento</a>
+    <a href="#interaccion">5. Interacción</a>
+    <a href="#rendimiento">6. Rendimiento</a>
+    <a href="#video">7. Vídeo Explicativo</a>
+  </nav>
+
+  <div class="container">
+
+    <div class="hero-carousel">
+      <div class="hero-slide active">
+        <h3>⚡ Módulo 1: El Núcleo de Cómputo</h3>
+        <p>La ALU es el circuito combinacional responsable de procesar todas las operaciones matemáticas y lógicas del procesador.</p>
+      </div>
+      <div class="hero-slide">
+        <h3>🧮 Módulo 2: Operaciones Binarias</h3>
+        <p>Suma, resta mediante Complemento a Dos, multiplicación y división ejecutadas velozmente a nivel de silicio.</p>
+      </div>
+      <div class="hero-slide">
+        <h3>🔀 Módulo 3: Lógica y Control de Flujo</h3>
+        <p>Arreglos de compuertas AND, OR, NOT y XOR que controlan la toma de decisiones y activan banderas (Flags).</p>
+      </div>
+      <div class="hero-slide">
+        <h3>⏩ Módulo 4: Desplazamiento de Bits</h3>
+        <p>Multiplicaciones y divisiones por potencias de 2 ejecutadas instantáneamente en un solo ciclo de reloj.</p>
+      </div>
+
+      <div class="hero-nav">
+        <button class="hero-btn" onclick="prevHeroSlide()">❮ Anterior</button>
+        <div class="hero-dots">
+          <span class="h-dot active-h-dot" onclick="setHeroSlide(0)"></span>
+          <span class="h-dot" onclick="setHeroSlide(1)"></span>
+          <span class="h-dot" onclick="setHeroSlide(2)"></span>
+          <span class="h-dot" onclick="setHeroSlide(3)"></span>
+        </div>
+        <button class="hero-btn" onclick="nextHeroSlide()">Siguiente ❯</button>
+      </div>
+    </div>
+
+    <!-- 1. INTRODUCCIÓN -->
+    <section id="intro">
+      <h2>1. Introducción a la Unidad Aritmético-Lógica (ALU)</h2>
+      <h3>Definición y propósito dentro del procesador</h3>
+      <p>La <strong>Unidad Aritmético-Lógica (ALU)</strong> es un circuito combinacional digital que constituye el núcleo fundamental de cálculo dentro de la Unidad Central de Procesamiento (CPU). Su propósito principal es ejecutar todas las operaciones aritméticas (suma, resta, multiplicación) y lógicas (AND, OR, NOT, XOR) necesarias para el procesamiento de datos y la ejecución de instrucciones de los programas de cómputo.</p>
+      <h3>Historia y evolución en la arquitectura computacional</h3>
+      <ul>
+        <li><strong>Propuesta de Von Neumann (1945):</strong> John von Neumann introdujo el concepto formal de la ALU en su reporte sobre la computadora EDVAC.</li>
+        <li><strong>Era de los Tubos de Vacío (Años 50):</strong> Las primeras ALUs se construían mediante relés y válvulas de vacío.</li>
+        <li><strong>Circuitos Integrados y el IC 74181 (Años 70):</strong> Nace la primera ALU integrada completa en un solo chip de 4 bits.</li>
+        <li><strong>ALUs Modernas:</strong> Integración de arquitecturas de 64 bits, unidades FPUs y procesadores vectoriales SIMD.</li>
+      </ul>
+    </section>
+
+    <!-- 2. UNIDAD ARITMÉTICA -->
+    <section id="aritmetica">
+      <h2>2. Unidad Aritmética</h2>
+      <h3>Operaciones básicas</h3>
+      <p>Es la encargada de realizar cálculos numéricos en formato binario:</p>
+      <ul>
+        <li><strong>Suma:</strong> Operación base ejecutada mediante sumadores lógicos y propagación de acarreos.</li>
+        <li><strong>Resta:</strong> Se implementa sumando el primer operando con el Complemento a Dos del segundo operando (A - B = A + (-B)).</li>
+        <li><strong>Multiplicación y División:</strong> Se ejecutan mediante sumas/restas sucesivas con desplazamientos de bits.</li>
+      </ul>
+      <h3>Ejemplos de circuitos aritméticos</h3>
+      <ul>
+        <li><strong>Semisumador (Half Adder):</strong> Suma 2 bits y produce Suma (S) y Acarreo (C).</li>
+        <li><strong>Sumador Completo (Full Adder):</strong> Suma 2 bits más un acarreo previo (Cin), generando la suma y el nuevo acarreo (Cout).</li>
+      </ul>
+      <div class="simulator">
+        <h3>Simulador de Suma Binaria (4-bits)</h3>
+        <div class="sim-controls">
+          <input type="number" id="num1" min="0" max="15" value="5">
+          <span>+</span>
+          <input type="number" id="num2" min="0" max="15" value="3">
+          <button onclick="calcularSuma()">Calcular Suma</button>
+        </div>
+        <div class="result-box" id="resultado-suma">Resultado Decimal: 8 | Binario: 00001000</div>
+      </div>
+    </section>
+
+    <!-- 3. UNIDAD LÓGICA -->
+    <section id="logica">
+      <h2>3. Unidad Lógica</h2>
+      <h3>Operaciones lógicas bit a bit</h3>
+      <ul>
+        <li><strong>AND:</strong> Produce 1 solo si ambas entradas son 1 (enmascaramiento).</li>
+        <li><strong>OR:</strong> Produce 1 si al menos una entrada es 1 (activación de bits).</li>
+        <li><strong>NOT:</strong> Invierte todos los bits (0 a 1 y 1 a 0).</li>
+        <li><strong>XOR:</strong> Produce 1 solo si las entradas son distintas (comparaciones y cifrado).</li>
+      </ul>
+      <h3>Aplicación en control de flujo</h3>
+      <p>Las operaciones lógicas permiten verificar condiciones e invocar el registro de estado (Flags Z, N) para tomar saltos condicionales (`IF`, `WHILE`, `JMP`).</p>
+      <div class="simulator">
+        <h3>Simulador: Operaciones Lógicas Bitwise</h3>
+        <div class="sim-controls">
+          <input type="number" id="logA" min="0" max="255" value="12">
+          <select id="operacionLogica">
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+            <option value="XOR">XOR</option>
+          </select>
+          <input type="number" id="logB" min="0" max="255" value="10">
+          <button onclick="calcularLogica()">Procesar</button>
+        </div>
+        <div class="result-box" id="resultado-logica">Resultado (AND): 8 | Binario: 00001000</div>
+      </div>
+    </section>
+
+    <!-- 4. UNIDAD DE DESPLAZAMIENTO -->
+    <section id="desplazamiento">
+      <h2>4. Unidad de Desplazamiento</h2>
+      <h3>Tipos de desplazamiento</h3>
+      <ul>
+        <li><strong>Lógico:</strong> Desplaza los bits rellenando vacíos con ceros (`0`).</li>
+        <li><strong>Aritmético:</strong> Preserva el bit de signo (MSB) para mantener enteros negativos.</li>
+        <li><strong>Rotacional (Circular):</strong> Los bits desplazados vuelven a ingresar por el extremo opuesto.</li>
+      </ul>
+      <h3>Multiplicación y División Rápida</h3>
+      <p>Desplazar 1 posición a la izquierda equivale a <strong>multiplicar por 2</strong>. Desplazar a la derecha equivale a <strong>dividir entre 2</strong>.</p>
+      <div class="simulator">
+        <h3>Simulador: Desplazamiento de Bits</h3>
+        <div class="sim-controls">
+          <input type="number" id="shiftVal" min="0" max="255" value="8">
+          <select id="shiftDir">
+            <option value="left">Izquierda (&lt;&lt;) [x2]</option>
+            <option value="right">Derecha (&gt;&gt;) [/2]</option>
+          </select>
+          <button onclick="calcularShift()">Ejecutar Desplazamiento</button>
+        </div>
+        <div class="result-box" id="resultado-shift">Resultado Decimal: 16 | Binario: 00010000</div>
+      </div>
+    </section>
+
+    <!-- 5. INTERACCIÓN ENTRE LAS UNIDADES -->
+    <section id="interaccion">
+      <h2>5. Interacción entre las Unidades</h2>
+      <p>Todas las sub-unidades (Aritmética, Lógica y Desplazamiento) calculan los resultados en paralelo. Un <strong>Multiplexor (MUX)</strong>, controlado por el código de operación (Opcode) enviado por la Unidad de Control, selecciona qué resultado se enviará al bus de salida.</p>
+      <h3>Ejemplo en lenguaje ensamblador: <code>ADD EAX, EBX</code></h3>
+      <ol>
+        <li><strong>Búsqueda (Fetch) y Decodificación:</strong> La Unidad de Control interpreta <code>ADD</code> y lee los registros `EAX` y `EBX`.</li>
+        <li><strong>Ejecución (Execute):</strong> La ALU canaliza los datos hacia la Unidad Aritmética para realizar la suma binaria.</li>
+        <li><strong>Escritura (Writeback):</strong> El multiplexor envía el resultado al registro `EAX` y actualiza las banderas de estado (Flags Z, C, N, V).</li>
+      </ol>
+    </section>
+
+    <!-- 6. RENDIMIENTO -->
+    <section id="rendimiento">
+      <h2>6. Importancia de la ALU en el Rendimiento del Sistema</h2>
+      <ul>
+        <li><strong>Ciclo de Instrucción:</strong> Impacta directamente en el tiempo empleado durante la etapa de Ejecución y la frecuencia de reloj soportada.</li>
+        <li><strong>Optimización moderna:</strong> Implementación de arquitecturas <em>Superescalares</em>, <em>Pipelining</em> y extensiones vectoriales <em>SIMD</em>.</li>
+      </ul>
+    </section>
+
+    <!-- 7. VÍDEO EXPLICATIVO -->
+    <section id="video">
+      <h2>7. Vídeo Explicativo</h2>
+      <p>A continuación se presenta el vídeo explicativo con el desglose teórico y práctico de la actividad:</p>
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Vídeo Explicativo ALU" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>Trabajo de Aplicación II Corte — Arquitectura de Computadores</p>
+  </footer>
+
+  <script>
+    let currentHero = 0;
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    const heroDots = document.querySelectorAll('.h-dot');
+
+    function showHeroSlide(index) {
+      heroSlides.forEach((slide, i) => {
+        slide.classList.remove('active');
+        heroDots[i].classList.remove('active-h-dot');
+      });
+      heroSlides[index].classList.add('active');
+      heroDots[index].classList.add('active-h-dot');
+    }
+
+    function nextHeroSlide() {
+      currentHero = (currentHero + 1) % heroSlides.length;
+      showHeroSlide(currentHero);
+    }
+
+    function prevHeroSlide() {
+      currentHero = (currentHero - 1 + heroSlides.length) % heroSlides.length;
+      showHeroSlide(currentHero);
+    }
+
+    function setHeroSlide(index) {
+      currentHero = index;
+      showHeroSlide(currentHero);
+    }
+
+    setInterval(nextHeroSlide, 4000);
+
+    function calcularSuma() {
+      const a = parseInt(document.getElementById('num1').value) || 0;
+      const b = parseInt(document.getElementById('num2').value) || 0;
+      const res = a + b;
+      document.getElementById('resultado-suma').innerText = `Resultado Decimal: ${res} | Binario: ${res.toString(2).padStart(8, '0')}`;
+    }
+
+    function calcularLogica() {
+      const a = parseInt(document.getElementById('logA').value) || 0;
+      const b = parseInt(document.getElementById('logB').value) || 0;
+      const op = document.getElementById('operacionLogica').value;
+      let res = op === 'AND' ? (a & b) : op === 'OR' ? (a | b) : (a ^ b);
+      document.getElementById('resultado-logica').innerText = `Resultado (${op}): ${res} | Binario: ${res.toString(2).padStart(8, '0')}`;
+    }
+
+    function calcularShift() {
+      const val = parseInt(document.getElementById('shiftVal').value) || 0;
+      const dir = document.getElementById('shiftDir').value;
+      let res = dir === 'left' ? val << 1 : val >> 1;
+      document.getElementById('resultado-shift').innerText = `Resultado Decimal: ${res} | Binario: ${res.toString(2).padStart(8, '0')}`;
+    }
+  </script>
+
+</body>
+</html>
